@@ -27,16 +27,18 @@ local function tableToMap(table)
   return map
 end
 
-local function createResizeCanvas(alpha)
+local function createResizeCanvas(customFill, customStroke, customStrokeWidth)
   local canvas = hs.canvas.new{}
 
   canvas:insertElement(
     {
       id = 'opaque_layer',
-      action = 'fill',
+      action = 'strokeAndFill',
       type = 'rectangle',
-      fillColor = { red = 0, green = 0, blue = 0, alpha = alpha },
-      roundedRectRadii = { xRadius = 5.0, yRadius = 5.0 },
+      fillColor = customFill,
+      strokeColor = customStroke,
+      strokeWidth = customStrokeWidth,
+      roundedRectRadii = { xRadius = 10.0 + customStrokeWidth, yRadius = 10.0 + customStrokeWidth },
     },
     1
   )
@@ -60,6 +62,9 @@ end
 -- Usage:
 --   resizer = SkyRocket:new({
 --     opacity = 0.3,
+--     fillColor = { white = 0.5, alpha = 0.3 }, -- as per `hs.drawing.color` (if provided, overwrites `opacity`)
+--     strokeColor = { white = 0.5, alpha = 0.3 }, -- also as per `hs.drawing.color`
+--     strokeWidth = 1,
 --     moveModifiers = {'cmd', 'shift'},
 --     moveMouseButton = 'left',
 --     resizeModifiers = {'ctrl', 'shift'}
@@ -80,13 +85,29 @@ end
 function SkyRocket:new(options)
   options = options or {}
 
+  local fill = nil
+  if type(options.fillColor) == "table" then
+    fill = options.fillColor
+  else
+    fill = { white = 0, alpha = options.opacity or 0.3 }
+  end
+
+  local stroke = nil
+  if type(options.fillColor) == "table" then
+    stroke = options.strokeColor
+  else
+    stroke = { white = 0, alpha = options.opacity or 0.3 }
+  end
+
+  local strokeWidth = options.strokeWidth or 1
+
   local resizer = {
     disabledApps = tableToMap(options.disabledApps or {}),
     dragging = false,
     dragType = nil,
     moveStartMouseEvent = buttonNameToEventType(options.moveMouseButton or 'left', 'moveMouseButton'),
     moveModifiers = options.moveModifiers or {'cmd', 'shift'},
-    windowCanvas = createResizeCanvas(options.opacity or 0.3),
+    windowCanvas = createResizeCanvas(fill, stroke, strokeWidth),
     resizeStartMouseEvent = buttonNameToEventType(options.resizeMouseButton or 'left', 'resizeMouseButton'),
     resizeModifiers = options.resizeModifiers or {'ctrl', 'shift'},
     targetWindow = nil,

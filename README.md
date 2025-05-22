@@ -34,6 +34,15 @@ sky = SkyRocket:new({
   -- Opacity of resize canvas
   opacity = 0.3,
 
+  -- Change default color of resize canvas (if provided, overwrites `opacity`)
+  fillColor = { white = 0.5, alpha = 0.3 }, -- as per `hs.drawing.color`
+
+  -- Change default color of resize canvas outline
+  strokeColor = { white = 0.5, alpha = 0.3 }, -- as per `hs.drawing.color`
+
+  -- Change default width of resize canvas outline
+  strokeWidth = 1, -- set `strokeWidth = 0` to hide the outline
+
   -- Which modifiers to hold to move a window?
   moveModifiers = {'cmd', 'shift'},
 
